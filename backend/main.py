@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,7 +11,21 @@ from app.models.insurance import InsurancePolicy
 app = FastAPI(title="Smart Expense Tracker API")
 
 # Ensure DB tables exist (simple project setup).
-Base.metadata.create_all(bind=engine)
+# On production (Render/Postgres), prefer migrations; by default we disable
+# auto-creating tables there to avoid repeated startup side effects.
+_auto_create_default = (
+    "false"
+    if "render.com" in (os.getenv("DATABASE_URL") or "")
+    else "true"
+)
+AUTO_CREATE_TABLES = os.getenv("AUTO_CREATE_TABLES", _auto_create_default).lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
+if AUTO_CREATE_TABLES:
+    Base.metadata.create_all(bind=engine)
 
 # Add CORS middleware
 # Note: allow_origins="*" cannot be used with allow_credentials=True (browser blocks it)
