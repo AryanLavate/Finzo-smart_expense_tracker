@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../services/api';
+import { getCurrentUser, loginUser, registerUser } from '../services/api';
 import AuthContext from './authContext';
 
 export const AuthProvider = ({ children }) => {
@@ -17,9 +17,9 @@ export const AuthProvider = ({ children }) => {
 
             try {
                 // Verify token server-side and get user profile
-                const res = await api.get('/auth/me');
-                setUser(res.data);
-                if (res.data?.email) localStorage.setItem('userEmail', res.data.email);
+                const userData = await getCurrentUser();
+                setUser(userData);
+                if (userData?.email) localStorage.setItem('userEmail', userData.email);
             } catch {
                 localStorage.removeItem('token');
                 localStorage.removeItem('userEmail');
@@ -33,38 +33,24 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        // Use x-www-form-urlencoded so FastAPI's OAuth2PasswordRequestForm can parse it reliably
-        const formData = new URLSearchParams();
-        formData.append('username', email);
-        formData.append('password', password);
-
-        const response = await api.post('/auth/login', formData, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        });
-        const { access_token } = response.data;
+        const loginData = await loginUser(email, password);
+        const { access_token } = loginData;
         localStorage.setItem('token', access_token);
         localStorage.setItem('userEmail', email);
 
         // Fetch full profile to get the role
         try {
-            const res = await api.get('/auth/me');
-            setUser(res.data);
+            const userData = await getCurrentUser();
+            setUser(userData);
         } catch {
             setUser({ email });
         }
 
-        return response.data;
+        return loginData;
     };
 
     const register = async (email, password, fullName) => {
-        const response = await api.post('/auth/register', {
-            email,
-            password,
-            full_name: fullName,
-        }, {
-            headers: { 'Content-Type': 'application/json' },
-        });
-        return response.data;
+        return registerUser(email, password, fullName);
     };
 
     const logout = () => {
