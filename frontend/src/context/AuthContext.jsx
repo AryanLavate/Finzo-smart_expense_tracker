@@ -61,6 +61,8 @@ export const AuthProvider = ({ children }) => {
             email,
             password,
             full_name: fullName,
+        }, {
+            headers: { 'Content-Type': 'application/json' },
         });
         return response.data;
     };
