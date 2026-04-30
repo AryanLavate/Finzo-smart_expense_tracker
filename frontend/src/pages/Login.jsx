@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/useAuth';
+import { API_URL } from '../services/api';
 import { LogIn, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -29,7 +30,7 @@ const Login = () => {
                         : JSON.stringify(backendDetail)
                 );
             } else if (!err?.response) {
-                setError('Cannot connect to server. Make sure the backend is running at http://localhost:8000');
+                setError(`Cannot connect to server. Make sure the backend is reachable at ${API_URL}`);
             } else if (status === 401) {
                 setError('Incorrect email or password.');
             } else if (status === 422) {
