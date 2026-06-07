@@ -276,20 +276,6 @@ http://127.0.0.1:8000/redoc
 ```
 
 ---
-
-# Screenshots
-
-## Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-## Expense Analytics
-![Analytics](screenshots/analytics.png)
-
-## Insurance Module
-![Insurance](screenshots/insurance.png)
-
----
-
 # Core Functionalities
 
 - User Registration & Login
